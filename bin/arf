@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
+$LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
+
+require 'optparse'
+require 'ostruct'
+require 'arf'
+
+
+unless Process.euid.zero?
+  puts "Sorry, the LED Board requires root privileges to run. Try again with sudo."
+  exit!
+end
+
+options = OpenStruct.new(
+  daemonize: false,
+  pidfile: '/var/run/arf/arf.pid',
+  logfile: '/var/log/arf.log'
+)
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: sudo arf [options]"
+
+  opts.on('-d', '--[no-]daemonize', 'Run this shit in the background') do |daemonize|
+    options.daemonize = daemonize
+  end
+
+  opts.on('-p', '--pidfile PIDFILE', 'File to write the PID to when run as a daemon') do |pidfile|
+    opts.pidfile = pidfile
+  end
+
+  opts.on('-l', '--logfile LOGFILE', 'File to write logs to when run as a daemon') do |logfile|
+    opts.logfile = logfile
+  end
+
+end
+
+Arf.daemonize! if options.daemonize
+Arf.start!
+
+at_exit do
+  Arf.stop!
+end
