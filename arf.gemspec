@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Lee Machin"]
   spec.description   = %q{Give developers their moment of fame (or shame) on an LED board}
   spec.summary       = %q{Give developers the praise they deserve (or unwanted attention they probably don't) by showing when they break or fix a build. For funsies.}
-  spec.homepage      = "leemachin.github.io/arf"
+  spec.homepage      = "https://leemachin.github.io/arf"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
