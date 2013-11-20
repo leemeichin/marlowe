@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "travis"
+  spec.add_runtime_dependency "travis", "~> 1.6.3.travis.381.4"
   spec.add_runtime_dependency "led_board"
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
