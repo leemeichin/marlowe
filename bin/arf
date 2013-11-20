@@ -5,6 +5,7 @@ $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'optparse'
 require 'ostruct'
+require 'pathname'
 require 'arf'
 
 
