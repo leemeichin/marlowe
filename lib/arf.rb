@@ -1,41 +1,40 @@
 require 'led_board'
-require 'arf/travis'
+require 'arf/listener'
 require 'arf/led_notification'
 require 'arf/broken'
 require 'arf/fixed'
 
-module Arf
-
-  ACCESS_TOKEN = ENV['ACCESS_TOKEN']
-  TRAVIS_ORG = ENV['TRAVIS_ORG']
+class Arf
 
   attr_reader :board
-  attr_accessor :daemon
+  attr_accessor :daemonize, :travis_org, :access_token, :pidfile, :logfile
 
-  module_function
+  def connect_board
+    @board ||= LEDBoard.connect(1)
+  end
 
   def start!
-    PiWire.init
-    @board ||= LEDBoard.connect(1)
-    Arf::Travis.new(access_token: self::ACCESS_TOKEN).listen_for_build_completions!
+    connect_board
+    Arf::Listener.new(access_token: access_token, travis_org: travis_org).listen_for_build_completions!
   end
 
   def stop!
     board && board.disconnect
 
-    if daemon
-      Arf.pidfile.delete
+    if daemonize
+      pidfile.delete
     end
   end
 
   def daemonize!
-    if pid = File.read(Arf.pidfile) rescue nil
+    return unless daemon
+
+    if pid = File.read(pidfile) rescue nil
       raise "An Arf process (#{pid}) is already running. Stop it first."
     end
 
     if Process.daemon
-      Arf.pidfile.open {|f| f.write(Process.pid) }
-      self.daemon = true
+      pidfile.open {|f| f.write(Process.pid) }
     end
   end
 

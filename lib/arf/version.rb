@@ -1,3 +1,3 @@
-module Arf
+class Arf
   VERSION = "0.0.1"
 end

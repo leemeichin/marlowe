@@ -1,6 +1,6 @@
 require 'travis'
 
-module Arf
+class Arf
   class Broken < LEDNotification
 
     def color

@@ -1,20 +1,23 @@
 require 'travis'
 require 'travis/pro'
 
-module Arf
-  class Travis
+class Arf
+  class Listener
 
     STATUSES = {
       broken: ->(build, _) { build.failed? || build.errored? },
       fixed:  ->(previous_build, event) { (previous_build.failed? || previous_build.errored?) && event.build.passed? }
     }
 
-    def initialize(access_token: Arf::ACCESS_TOKEN)
-      ::Travis::Pro.access_token = access_token
+    attr_reader :travis_org
+
+    def initialize(access_token: nil, travis_org: nil)
+      Travis::Pro.access_token = access_token
+      @travis_org = travis_org
     end
 
     def listen_for_build_completions!
-      ::Travis::Pro.listen(*repo_names) do |stream|
+      Travis::Pro.listen(*repos) do |stream|
         stream.on 'build:finished' do |event|
           case event
           when STATUSES[:broken].curry(event.build)
@@ -29,15 +32,11 @@ module Arf
     private
 
     def user
-      ::Travis::Pro::User.current
+      Travis::Pro::User.current
     end
 
     def repos
-      @repos ||= user.session.get("/repos/#{Arf::TRAVIS_ORG}")["repos"]
-    end
-
-    def repo_names
-      repos.map(&:name)
+      @repos ||= user.session.get("/repos/#{travis_org}")["repos"]
     end
 
   end

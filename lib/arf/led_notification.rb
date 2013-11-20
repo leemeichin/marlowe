@@ -1,4 +1,4 @@
-module Arf
+class Arf
   class LEDNotification
 
     attr_reader :build

@@ -14,32 +14,34 @@ unless Process.euid.zero?
   exit!
 end
 
-options = OpenStruct.new(
-  daemonize: false,
-  pidfile: Pathname.new('/var/run/arf/arf.pid'),
-  logfile: Pathname.new('/var/log/arf.log')
-)
+arf = Arf.new
 
 OptionParser.new do |opts|
   opts.banner = "Usage: sudo arf [options]"
 
   opts.on('-d', '--[no-]daemonize', 'Run this shit in the background') do |daemonize|
-    options.daemonize = daemonize
+    arf.daemon = daemonize
   end
 
   opts.on('-p', '--pidfile PIDFILE', 'File to write the PID to when run as a daemon') do |pidfile|
-    opts.pidfile = Pathname.new(pidfile)
+    arf.pidfile = Pathname.new(pidfile)
   end
 
   opts.on('-l', '--logfile LOGFILE', 'File to write logs to when run as a daemon') do |logfile|
-    opts.logfile = Pathname.new(logfile)
+    arf.logfile = Pathname.new(logfile)
   end
 
-end
+  opts.on('-t', '--token TOKEN', 'Access token for Travis CI Pro') do |token|
+    arf.access_token = token
+  end
 
-Arf.daemonize! if options.daemonize
-Arf.start!
+  opts.on('-o', '--org ORG', 'Github organisation to search for private repos in') do |org|
+    arf.travis_org = org
+  end
+end.parse!
+
+arf.start!
 
 at_exit do
-  Arf.stop!
+  arf.stop!
 end
