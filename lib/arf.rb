@@ -7,6 +7,7 @@ require 'arf/fixed'
 module Arf
 
   ACCESS_TOKEN = ENV['ACCESS_TOKEN']
+  TRAVIS_ORG = ENV['TRAVIS_ORG']
 
   attr_reader :board
   attr_accessor :daemon

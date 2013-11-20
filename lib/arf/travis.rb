@@ -33,7 +33,7 @@ module Arf
     end
 
     def repos
-      @repos ||= user.repositories
+      @repos ||= user.session.get("/repos/#{Arf.TRAVIS_ORG}")["repos"]
     end
 
     def repo_names
