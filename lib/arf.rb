@@ -12,10 +12,12 @@ module Arf
   attr_reader :board
   attr_accessor :daemon
 
+  module_function
+
   def start!
     PiWire.init
     @board ||= LEDBoard.connect(1)
-    Arf::Travis.new(ACCESS_TOKEN).listen_for_build_completions!
+    Arf::Travis.new(access_token: self::ACCESS_TOKEN).listen_for_build_completions!
   end
 
   def stop!
@@ -36,7 +38,5 @@ module Arf
       self.daemon = true
     end
   end
-
-  module_function :daemonize!
 
 end
