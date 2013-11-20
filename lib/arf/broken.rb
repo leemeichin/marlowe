@@ -4,7 +4,7 @@ module Arf
   class Broken < LEDNotification
 
     def color
-      LEDBoard::Color::INVERSE_RED
+      LEDBoard::Color::INVERSED_RED
     end
 
     def message

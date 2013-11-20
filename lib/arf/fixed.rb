@@ -4,7 +4,7 @@ module Arf
   class Fixed < LEDNotification
 
     def color
-      LEDBoard::Color::INVERSE_GREEN
+      LEDBoard::Color::INVERSED_GREEN
     end
 
     def message
