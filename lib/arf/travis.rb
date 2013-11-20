@@ -1,3 +1,6 @@
+require 'travis'
+require 'travis/pro'
+
 module Arf
   class Travis
 
@@ -18,7 +21,7 @@ module Arf
             Arf::Broken.new(event.build)
           when EVENTS[:fixed].curry(event.repository.recent_builds.to_a[-2])
             Arf::Fixed.new(event.build)
-          end
+          end.trigger!
         end
       end
     end

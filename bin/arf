@@ -15,8 +15,8 @@ end
 
 options = OpenStruct.new(
   daemonize: false,
-  pidfile: '/var/run/arf/arf.pid',
-  logfile: '/var/log/arf.log'
+  pidfile: Pathname.new('/var/run/arf/arf.pid'),
+  logfile: Pathname.new('/var/log/arf.log')
 )
 
 OptionParser.new do |opts|
@@ -27,11 +27,11 @@ OptionParser.new do |opts|
   end
 
   opts.on('-p', '--pidfile PIDFILE', 'File to write the PID to when run as a daemon') do |pidfile|
-    opts.pidfile = pidfile
+    opts.pidfile = Pathname.new(pidfile)
   end
 
   opts.on('-l', '--logfile LOGFILE', 'File to write logs to when run as a daemon') do |logfile|
-    opts.logfile = logfile
+    opts.logfile = Pathname.new(logfile)
   end
 
 end
