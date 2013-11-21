@@ -8,7 +8,7 @@ class Arf
     end
 
     def message
-      "     PASSED"
+      "   PASSED"
     end
 
   end
