@@ -39,7 +39,6 @@ class Arf
             leading: LEDBoard::Leading::IMMEDIATE,
             lagging: LEDBoard::Lagging::IMMEDIATE,
             waiting: LEDBoard::Waiting::MEDIUM,
-            display: LEDBoard::Display::MIDDLE_FAST_BLINK,
             color: color,
             font: LEDBoard::Font::BOLD
           ),
