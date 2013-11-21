@@ -19,12 +19,13 @@ class Arf
     def listen_for_build_completions!
       Travis::Pro.listen(*repos) do |stream|
         stream.on 'build:finished' do |event|
+          puts "Build finished: #{event.build}\t Status: #{event.build.status}"
           case event
           when STATUSES[:broken].curry(event.build)
             Arf::Broken.new(build: event.build)
           when STATUSES[:fixed].curry(event.repository.recent_builds.to_a[-2])
             Arf::Fixed.new(build: event.build)
-          end.trigger!
+          end.transmit!
         end
       end
     end
