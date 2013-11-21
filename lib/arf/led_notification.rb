@@ -8,7 +8,7 @@ class Arf
     end
 
     def repo_name
-      event.payload["repository"]["slug"][/[^\/]+$/]
+      event.payload["repository"]
     end
 
     def message
@@ -21,26 +21,14 @@ class Arf
 
     def transmit!
       with_led_board do |board|
-        pages = []
 
-        pages << LEDBoard::Page.new(message,
-          page: 'A',
-          leading: LEDBoard::Leading::IMMEDIATE,
-          lagging: LEDBoard::Lagging::IMMEDIATE,
-          waiting: LEDBoard::Waiting::MEDIUM,
+        text = LEDBoard::Page.new(repo_name,
+          waiting: LEDBoard::Waiting::FAST,
           color: color,
           font: LEDBoard::Font::BOLD
         )
-
-        pages << LEDBoard::Page.new(repo_name,
-          page: 'B',
-          waiting: LEDBoard::Waiting::FAST,
-          color: LEDBoard::Color::ORANGE,
-        )
-
-        schedule = LEDBoard::Schedule.new(['A', 'B'])
-        pages.each(&board.method(:send))
-        board.send(schedule)
+        
+        board.send(text)
       end
     end
 
