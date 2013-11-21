@@ -59,6 +59,8 @@ class Arf
     private
     def with_led_board
       board = LEDBoard.connect(1)
+      board.send " " # clear the board
+      sleep 1
       yield board
       board.disconnect
     end
