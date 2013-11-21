@@ -8,7 +8,7 @@ class Arf
     end
 
     def repo_name
-      event.payload["repository"]
+      event.payload["repository"]["slug"]
     end
 
     def message
