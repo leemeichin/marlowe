@@ -25,35 +25,33 @@ class Arf
 
     def transmit!
       with_led_board do |board|
-        pages = {
-          A: LEDBoard::Page.new(hero_or_culprit,
-            page: 'A',
-            waiting: LEDBoard::Waiting::FAST,
-            leading: LEDBoard::Leading::SNOW,
-            lagging: LEDBoard::Lagging::IMMEDIATE,
-            color: LEDBoard::Color::ORANGE
-          ),
+        pages = []
+        
+        pages << LEDBoard::Page.new(hero_or_culprit,
+          page: 'A',
+          waiting: LEDBoard::Waiting::FAST,
+          leading: LEDBoard::Leading::SNOW,
+          lagging: LEDBoard::Lagging::IMMEDIATE,
+          color: LEDBoard::Color::ORANGE
+        )
 
-          B: LEDBoard::Page.new(message,
-            page: 'B',
-            leading: LEDBoard::Leading::IMMEDIATE,
-            lagging: LEDBoard::Lagging::IMMEDIATE,
-            waiting: LEDBoard::Waiting::MEDIUM,
-            color: color,
-            font: LEDBoard::Font::BOLD
-          ),
+        pages << LEDBoard::Page.new(message,
+          page: 'B',
+          leading: LEDBoard::Leading::IMMEDIATE,
+          lagging: LEDBoard::Lagging::IMMEDIATE,
+          waiting: LEDBoard::Waiting::MEDIUM,
+          color: color,
+          font: LEDBoard::Font::BOLD
+        )
 
-          C: LEDBoard::Page.new(repo_name,
-            page: 'C',
-            waiting: LEDBoard::Waiting::FAST,
-            color: LEDBoard::Color::ORANGE,
-          )
-        }
+        pages << LEDBoard::Page.new(repo_name,
+          page: 'C',
+          waiting: LEDBoard::Waiting::FAST,
+          color: LEDBoard::Color::ORANGE,
+        )
 
-        schedule = LEDBoard::Schedule.new(['A', 'B', 'C'], ends_at: Time.now + 60)
-        board.send(pages[:A])
-        board.send(pages[:B])
-        board.send(pages[:C])
+        schedule = LEDBoard::Schedule.new(['A', 'B', 'C'])
+        pages.each(&board.method(:send))
         board.send(schedule)
       end
     end
