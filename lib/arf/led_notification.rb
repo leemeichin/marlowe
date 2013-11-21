@@ -22,7 +22,7 @@ class Arf
     def transmit!
       with_led_board do |board|
 
-        text = LEDBoard::Page.new(repo_name,
+        text = LEDBoard::Page.new(repo_name.upcase,
           waiting: LEDBoard::Waiting::FAST,
           color: color,
           font: LEDBoard::Font::BOLD
