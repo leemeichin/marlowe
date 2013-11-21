@@ -6,21 +6,13 @@ require 'arf/fixed'
 
 class Arf
 
-  attr_reader :board
   attr_accessor :daemonize, :travis_org, :access_token, :pidfile, :logfile
 
-  def connect_board
-    @board ||= LEDBoard.connect(1)
-  end
-
   def start!
-    connect_board
     Arf::Listener.new(access_token: access_token, travis_org: travis_org).listen_for_build_completions!
   end
 
   def stop!
-    board && board.disconnect
-
     if daemonize
       pidfile.delete
     end

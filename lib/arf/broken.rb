@@ -4,11 +4,11 @@ class Arf
   class Broken < LEDNotification
 
     def color
-      LEDBoard::Color::INVERSED_RED
+      LEDBoard::Color::RED
     end
 
     def message
-      "BROKE THE BUILD"
+      "     BROKEN"
     end
 
   end

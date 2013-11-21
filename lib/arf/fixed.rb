@@ -4,11 +4,11 @@ class Arf
   class Fixed < LEDNotification
 
     def color
-      LEDBoard::Color::INVERSED_GREEN
+      LEDBoard::Color::GREEN
     end
 
     def message
-      "FIXED THE BUILD!"
+      "     PASSED"
     end
 
   end

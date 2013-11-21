@@ -1,18 +1,18 @@
 class Arf
   class LEDNotification
 
-    attr_reader :build
+    attr_reader :event
 
-    def initialize(build: nil)
-      @build = build
+    def initialize(event: nil)
+      @event = event
     end
 
     def hero_or_culprit
-      build.commit.author_name
+      event.payload["build"]["author_name"]
     end
 
     def repo_name
-      build.repository.name
+      event.payload["repository"]["slug"][/[^\/]+$/]
     end
 
     def message
@@ -24,36 +24,48 @@ class Arf
     end
 
     def transmit!
-      pages = [].tap do |p|
-        p << LEDBoard::Page.new(hero_or_culprit,
-          page: 'A',
-          waiting: LEDBoard::Waiting::SLOW,
-          leading: LEDBoard::Leading::SNOW,
-          lagging: LEDBoard::Lagging::SNOW,
-          color: LEDBoard::Color::ORANGE
-        )
+      with_led_board do |board|
+        pages = {
+          A: LEDBoard::Page.new(hero_or_culprit,
+            page: 'A',
+            waiting: LEDBoard::Waiting::FAST,
+            leading: LEDBoard::Leading::SNOW,
+            lagging: LEDBoard::Lagging::IMMEDIATE,
+            color: LEDBoard::Color::ORANGE
+          ),
 
-        p << LEDBoard::Page.new(message,
-          page: 'B',
-          leading: LEDBoard::Leading::SCROLL_LEFT,
-          lagging: LEDBoard::Lagging::SCROLL_LEFT,
-          waiting: LEDBoard::Waiting::MEDIUM,
-          display: LEDBoard::Display::MIDDLE_FAST_BLINK,
-          color: color,
-          font: LEDBoard::Font::BOLD
-        )
+          B: LEDBoard::Page.new(message,
+            page: 'B',
+            leading: LEDBoard::Leading::IMMEDIATE,
+            lagging: LEDBoard::Lagging::IMMEDIATE,
+            waiting: LEDBoard::Waiting::MEDIUM,
+            display: LEDBoard::Display::MIDDLE_FAST_BLINK,
+            color: color,
+            font: LEDBoard::Font::BOLD
+          ),
 
-        p << LEDBoard::Page.new(repo_name,
-          page: 'C',
-          waiting: LEDBoard::Waiting::MEDIUM,
-          color: LEDBoard::Color::ORANGE,
-        )
+          C: LEDBoard::Page.new(repo_name,
+            page: 'C',
+            waiting: LEDBoard::Waiting::FAST,
+            color: LEDBoard::Color::ORANGE,
+          )
+        }
+
+        schedule = LEDBoard::Schedule.new(['A', 'B', 'C'], ends_at: Time.now + 60)
+        board.send(pages[:A])
+        board.send(pages[:B])
+        board.send(pages[:C])
+        board.send(schedule)
       end
+    end
 
-      schedule = LEDBoard::Schedule.new(pages.map(&:page))
-
-      pages.each {|page| board.send(page) }
-      board.send(schedule)
+    private
+    def with_led_board
+      board = LEDBoard.connect(1)
+      board.send("")
+      sleep 2
+      yield board
+      board.disconnect
     end
   end
 

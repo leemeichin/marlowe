@@ -4,11 +4,6 @@ require 'travis/pro'
 class Arf
   class Listener
 
-    STATUSES = {
-      broken: ->(build, _) { build.failed? || build.errored? },
-      fixed:  ->(previous_build, event) { (previous_build.failed? || previous_build.errored?) && event.build.passed? }
-    }
-
     attr_reader :travis_org
 
     def initialize(access_token: nil, travis_org: nil)
@@ -19,13 +14,10 @@ class Arf
     def listen_for_build_completions!
       Travis::Pro.listen(*repos) do |stream|
         stream.on 'build:finished' do |event|
-          puts "Build finished: #{event.build}\t Status: #{event.build.status}"
-          case event
-          when STATUSES[:broken].curry(event.build)
-            Arf::Broken.new(build: event.build)
-          when STATUSES[:fixed].curry(event.repository.recent_builds.to_a[-2])
-            Arf::Fixed.new(build: event.build)
-          end.transmit!
+          puts "Build finished: #{event.payload["repository"]["slug"]}\n Status: #{event.build.state}"
+
+          Arf::Broken.new(event: event).transmit! if build_broken?(event)
+          Arf::Fixed.new(event: event).transmit! if build_fixed?(event)
         end
       end
     end
@@ -38,6 +30,14 @@ class Arf
 
     def repos
       @repos ||= user.session.get("/repos/#{travis_org}")["repos"]
+    end
+
+    def build_broken?(event)
+      event.build.failed? || event.build.errored?
+    end
+
+    def build_fixed?(event)
+      event.build.passed?
     end
 
   end
