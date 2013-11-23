@@ -9,7 +9,7 @@ Show build passes/failures from Travis in real-time on an LED display
 TODO: link to explanation of this when ready
 
 ```shell
-sudo arf --access-token=ACCESS_TOKEN --account=ACCOUNT [--pro]
+sudo arf --token=ACCESS_TOKEN --account=ACCOUNT [--pro]
 ```
 
 
