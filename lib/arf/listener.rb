@@ -4,41 +4,38 @@ require 'travis/pro'
 class Arf
   class Listener
 
-    attr_reader :travis_org
+    attr_reader :travis_account, :travis
 
-    def initialize(access_token: nil, travis_org: nil)
-      Travis::Pro.access_token = access_token
-      @travis_org = travis_org
+    def initialize(access_token: nil, travis_account: nil, pro_account: false)
+      @travis = pro_account ? Travis::Pro : Travis # this is a little odd
+      @travis_account = travis_account
+
+      @travis.access_token = access_token
     end
 
     def listen_for_build_completions!
-      Travis::Pro.listen(*repos) do |stream|
+      travis.listen(*repos) do |stream|
         stream.on 'build:finished' do |event|
-          puts "Build finished: #{event.payload["repository"]["slug"]}\n Status: #{event.build.state}"
-
-          Arf::Broken.new(event: event).transmit! if build_broken?(event)
-          Arf::Fixed.new(event: event).transmit! if build_fixed?(event)
+          if state.include?('passed', 'failed', 'errored')
+            print_status(event)
+            Arf::Message.new(event: event, state: event.build.state).send!
+          end
         end
       end
     end
 
     private
 
+    def print_status(event)
+      puts "Build finished: #{event.payload["repository"]["slug"]}\nStatus: #{event.build.state}"
+    end
+
     def user
-      Travis::Pro::User.current
+      travis::User.current
     end
 
     def repos
-      @repos ||= user.session.get("/repos/#{travis_org}")["repos"]
+      @repos ||= user.session.get("/repos/#{travis_account}")["repos"]
     end
-
-    def build_broken?(event)
-      event.build.failed? || event.build.errored?
-    end
-
-    def build_fixed?(event)
-      event.build.passed?
-    end
-
   end
 end

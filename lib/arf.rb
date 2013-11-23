@@ -6,28 +6,20 @@ require 'arf/fixed'
 
 class Arf
 
-  attr_accessor :daemonize, :travis_org, :access_token, :pidfile, :logfile
+  attr_reader :travis_account, :pro_account, :access_token, :listener
+
+  def initialize(options)
+    options.each do |key, val|
+      instance_variable_set :"@#key", val
+    end
+  end
 
   def start!
-    Arf::Listener.new(access_token: access_token, travis_org: travis_org).listen_for_build_completions!
-  end
-
-  def stop!
-    if daemonize
-      pidfile.delete
-    end
-  end
-
-  def daemonize!
-    return unless daemon
-
-    if pid = File.read(pidfile) rescue nil
-      raise "An Arf process (#{pid}) is already running. Stop it first."
-    end
-
-    if Process.daemon
-      pidfile.open {|f| f.write(Process.pid) }
-    end
+    @listener ||= Arf::Listener.new(
+      access_token: access_token,
+      travis_org: travis_account,
+      pro_account: pro_account
+    ).listen_for_build_completions!
   end
 
 end
