@@ -4,7 +4,7 @@ lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'optparse'
-require 'arf'
+require 'marlowe'
 
 unless Process.euid.zero?
   puts "Sorry, the LED Board requires root privileges to run. Try again with sudo."
@@ -12,28 +12,32 @@ unless Process.euid.zero?
 end
 
 options = {
-  pro_account: false
+  pro: false
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: sudo arf [options]"
+  opts.banner = "Usage: sudo marlowe [options]"
 
   opts.on('-t', '--token TOKEN', 'Access token for Travis CI Pro') do |token|
-    options[:access_token] = token
+    options[:token] = token
   end
 
   opts.on('-a', '--account ACCOUNT', 'Github organisation or account to search for repos in') do |account|
-    options[:travis_account] = account
+    options[:account] = account
   end
 
-  opts.on('-p', '--[no]-pro', 'Use a Travis CI Pro account, not a free one') do |pro|
-    options[:pro_account] = pro
+  opts.on('-p', '--[no-]pro', 'Use a Travis CI Pro account, not a free one') do |pro|
+    options[:pro] = pro
   end
 
 end.parse!
 
-arf = Arf.new(options)
+Marlowe.configure do |config|
+  config.token = options[:token]
+  config.account = options[:account]
+  config.pro = options[:pro]
+end
 
-arf.start!
+Marlowe.start!
 
-puts "Starting Arf..."
+puts "Starting Marlowe..."

@@ -1,4 +1,4 @@
-class Arf
+module Marlowe
   class Message
 
     COLORS = {
@@ -14,7 +14,7 @@ class Arf
     end
 
     def repo_name
-      event.payload["repository"]["slug"][/[^\/]+/]
+      event.payload["repository"]["slug"][/[^\/]+$/]
     end
 
 
